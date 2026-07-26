@@ -98,4 +98,29 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     color: AppColors.goldSoft,
   );
+
+  static TextStyle bodyMedium = GoogleFonts.cairo(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.gold,
+  );
+
+  static TextStyle azkarLarge = GoogleFonts.arefRuqaa(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.ivory,
+    height: 1.6,
+  );
+
+  static TextStyle o = GoogleFonts.cairo(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.goldSoft,
+    fontStyle: FontStyle.italic,
+  );
+
+  static TextStyle buttonLarge = GoogleFonts.cairo(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+  );
 }

@@ -16,7 +16,6 @@ class PrayerApiService {
     final uri = Uri.parse(
       '$_baseUrl/$ts?latitude=$latitude&longitude=$longitude&method=$method&timezonestring=${Uri.encodeComponent(timezone)}',
     );
-
     final response = await http.get(uri).timeout(const Duration(seconds: 12));
 
     if (response.statusCode != 200) {

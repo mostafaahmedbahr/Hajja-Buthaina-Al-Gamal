@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter/services.dart';
 
 import 'core/theme/app_colors.dart';
 import 'data/repositories/prayer_repository.dart';
@@ -11,7 +12,16 @@ import 'presentation/screens/mosque_clock_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ar', null); // لتنسيق التاريخ الاحتياطي بالعربية
+  await initializeDateFormatting('ar', null);
+  // السماح بجميع الاتجاهات (landscape + portrait)
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  // إخفاء شريط الحالة والتنقل للوضع الغامر (immersive)
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(const MosqueApp());
 }
 
