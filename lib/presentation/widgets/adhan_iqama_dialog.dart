@@ -108,8 +108,8 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
-        padding: const EdgeInsets.all(24),
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.all(40),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.gold.withOpacity(0.3), width: 2),
@@ -145,15 +145,15 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
 
         Text(
           isIqamaTime ? 'حَانَتْ الْإِقَامَةُ' : 'صَلَاةُ $prayerName',
-          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.gold),
+          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.gold, fontSize: 34),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         Text(
           isIqamaTime
               ? 'قَدْ قَامَتِ الصَّلَاةُ'
               : 'بَيْنَ الْأَذَانِ وَالْإِقَامَةِ',
-          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.goldSoft),
+          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.goldSoft, fontSize: 26),
           textAlign: TextAlign.center,
         ),
       ],
@@ -162,7 +162,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
 
   Widget _buildCountdown(bool isIqamaTime) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: AppColors.bgDeep.withOpacity(0.6),
@@ -182,9 +182,9 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         children: [
           Text(
             isIqamaTime ? 'الْإِقَامَةُ الْآنَ' : 'مُتَبَقٍّ لِلْإِقَامَةِ',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gold),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gold, fontSize: 22),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             transitionBuilder: (child, animation) => ScaleTransition(
@@ -196,7 +196,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
               key: ValueKey(_secondsToIqama),
               style: AppTextStyles.cardPrayerName.copyWith(
                 color: isIqamaTime ? AppColors.ember : AppColors.gold,
-                fontSize: 56,
+                fontSize: 88,
                 fontWeight: FontWeight.w700,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
@@ -221,6 +221,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
               style: AppTextStyles.cardPrayerName.copyWith(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w600,
+                fontSize: 24,
               ),
             ),
             const SizedBox(width: 8),
@@ -242,7 +243,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
           ),
           child: Container(
             key: ValueKey(_azkarIndex),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: AppColors.bgDeep.withOpacity(0.5),
@@ -252,7 +253,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
               children: [
                 Text(
                   _azkarBetweenAdhanIqama[_azkarIndex],
-                  style: AppTextStyles.azkarLarge.copyWith(height: 1.5),
+                  style: AppTextStyles.azkarLarge.copyWith(height: 1.5, fontSize: 28),
                   textAlign: TextAlign.center,
                   textDirection: TextDirection.rtl,
                 ),
@@ -281,8 +282,8 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         ),
         const SizedBox(height: 8),
         Text(
-          'قَالَ رَسُولُ اللَّهِ ﷺ: «الدُّعَاءُ لَا يُرَدُّ بَيْنَ الْأَذَانِ وَالْإِقَامَةِ»',
-          style: AppTextStyles.o.copyWith(color: AppColors.gold),
+          'قَالَ رَسُولُ اللَّهِ ﷺ: «الدُّعَاءُ لَا يُرَدُّ بَيْنَ الْأَذَانِ وَالْإِقَامَةِ»',
+          style: AppTextStyles.o.copyWith(color: AppColors.gold, fontSize: 18),
           textAlign: TextAlign.center,
         ),
       ],
@@ -297,14 +298,14 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.gold,
           foregroundColor: AppColors.bgDeep,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 22),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 4,
           shadowColor: AppColors.gold.withOpacity(0.4),
         ),
-        child: Text(
-          'إِغْلَاق',
-          style: AppTextStyles.buttonLarge.copyWith(color: AppColors.bgDeep),
+          child: Text(
+            'إِغْلَاق',
+            style: AppTextStyles.buttonLarge.copyWith(color: AppColors.bgDeep, fontSize: 24),
         ),
       ),
     );
