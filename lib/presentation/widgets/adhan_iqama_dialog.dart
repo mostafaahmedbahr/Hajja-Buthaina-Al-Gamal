@@ -68,12 +68,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         _timer.cancel();
         if (mounted) {
           setState(() => _secondsToIqama = 0);
-          // Auto-dismiss after 5 seconds when iqama time arrives
-          Future.delayed(const Duration(seconds: 5), () {
-            if (mounted) {
-              widget.onDismiss();
-            }
-          });
+          widget.onDismiss();
         }
       } else {
         setState(() => _secondsToIqama = remaining);

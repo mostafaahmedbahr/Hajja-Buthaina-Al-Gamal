@@ -5,7 +5,9 @@ import '../cubit/prayer_state.dart';
 
 class HeaderWidget extends StatelessWidget {
   final PrayerState state;
-  const HeaderWidget({super.key, required this.state});
+  final bool expanded;
+
+  const HeaderWidget({super.key, required this.state, this.expanded = false});
 
   String _clockTime(DateTime d) {
     final h12 = d.hour % 12 == 0 ? 12 : d.hour % 12;
@@ -17,13 +19,60 @@ class HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return expanded ? _buildWideHeader() : _buildCompactHeader();
+  }
+
+  Widget _buildWideHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          // الساعة (أقصى يمين في RTL)
+          Text(
+            '${_clockTime(state.now)} ${_meridiem(state.now)}',
+            style: AppTextStyles.clockTime.copyWith(fontSize: 40),
+            textDirection: TextDirection.ltr,
+          ),
+
+          const Spacer(),
+
+          // اسم المسجد (في النص)
+          Text(
+            MosqueConfig.name,
+            style: AppTextStyles.mosqueTitle.copyWith(fontSize: 38),
+            textAlign: TextAlign.center,
+          ),
+
+          const Spacer(),
+
+          // التاريخ (أقصى يسار في RTL)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                state.gregorianText,
+                style: AppTextStyles.dateGregorian.copyWith(fontSize: 20),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                state.hijriText,
+                style: AppTextStyles.dateHijri.copyWith(fontSize: 22),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
         runSpacing: 12,
         children: [
-          // التاريخ الميلادي + الهجري
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -33,8 +82,6 @@ class HeaderWidget extends StatelessWidget {
               Text(state.hijriText, style: AppTextStyles.dateHijri),
             ],
           ),
-
-          // اسم المسجد
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -43,8 +90,6 @@ class HeaderWidget extends StatelessWidget {
               Text(MosqueConfig.city, style: AppTextStyles.mosqueSubtitle),
             ],
           ),
-
-          // الساعة الحية
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,

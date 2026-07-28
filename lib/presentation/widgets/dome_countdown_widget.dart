@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -7,7 +8,11 @@ import '../cubit/prayer_state.dart';
 /// كلما اقترب موعد الصلاة القادمة، ويصل لامتلائه الكامل بالضبط عند دخول الوقت.
 class DomeCountdownWidget extends StatelessWidget {
   final PrayerState state;
-  const DomeCountdownWidget({super.key, required this.state});
+
+  /// عرض القوس — لو اتحدد يُستخدم مباشرة (مفيد لتخطيط الويب)
+  final double? width;
+
+  const DomeCountdownWidget({super.key, required this.state, this.width});
 
   String _fmtCountdown(int totalSeconds) {
     final h = totalSeconds ~/ 3600;
@@ -28,54 +33,61 @@ class DomeCountdownWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final nextPrayer = state.nextPrayer;
 
+    final double domeW = width ??
+        MediaQuery.of(context).size.width.clamp(280.0, 450.0);
+    final double domeH = domeW * 1.25;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 240,
-          height: 300,
+          width: domeW,
+          height: domeH,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // القوس + الامتلاء المتصاعد
               CustomPaint(
-                size: const Size(240, 300),
+                size: Size(domeW, domeH),
                 painter: _ArchPainter(progress: state.windowProgress),
               ),
 
-              // النصوص المتراكبة فوق القوس
+              // النصوص موزعة بالنسبة المئوية من ارتفاع القوس
               Positioned(
-                top: 90,
-                child: Text('الصلاة القادمة', style: AppTextStyles.domeLabel),
+                top: domeH * 0.28,
+                child: Text('الصلاة القادمة', style: AppTextStyles.domeLabel.copyWith(fontSize: 16)),
               ),
               Positioned(
-                top: 112,
+                top: domeH * 0.34,
                 child: Text(
                   nextPrayer?.arabicName ?? '—',
-                  style: AppTextStyles.domePrayerName,
+                  style: AppTextStyles.domePrayerName.copyWith(
+                    fontSize: (domeW * 0.15).clamp(28.0, 50.0),
+                  ),
                 ),
               ),
               Positioned(
-                top: 165,
+                top: domeH * 0.48,
                 child: Text(
                   _fmtCountdown(state.secondsToNext),
-                  style: AppTextStyles.domeCountdown,
+                  style: AppTextStyles.domeCountdown.copyWith(
+                    fontSize: (domeW * 0.15).clamp(28.0, 50.0),
+                  ),
                 ),
               ),
               Positioned(
-                top: 200,
+                top: domeH * 0.60,
                 child: Text(
                   nextPrayer != null ? 'عند ${_fmtHM(nextPrayer.time)}' : '',
-                  style: AppTextStyles.domeTargetTime,
+                  style: AppTextStyles.domeTargetTime.copyWith(fontSize: 14),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Text(
           'تحسب الشاشة الوقت المتبقي تلقائيًا وتنبّه عند دخول الوقت',
-          style: AppTextStyles.domeLabel,
+          style: AppTextStyles.domeLabel.copyWith(fontSize: 13),
           textAlign: TextAlign.center,
         ),
       ],
@@ -89,13 +101,19 @@ class _ArchPainter extends CustomPainter {
   _ArchPainter({required this.progress});
 
   Path _archPath(Size size) {
-    // قوس محراب مبسّط: قاعدة مستطيلة + قمة منحنية (شبيه بمدخل المسجد)
     final path = Path();
-    path.moveTo(42, 300);
-    path.lineTo(42, 150);
-    path.quadraticBezierTo(42, 58, 120, 28);
-    path.quadraticBezierTo(198, 58, 198, 150);
-    path.lineTo(198, 300);
+    final w = size.width;
+    final h = size.height;
+    final left = w * 0.175;
+    final right = w * 0.825;
+    final peak = h * 0.093;
+    final midY = h * 0.5;
+
+    path.moveTo(left, h);
+    path.lineTo(left, midY);
+    path.quadraticBezierTo(left, peak * 2.7, w / 2, peak);
+    path.quadraticBezierTo(right, peak * 2.7, right, midY);
+    path.lineTo(right, h);
     path.close();
     return path;
   }
@@ -104,16 +122,14 @@ class _ArchPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final archPath = _archPath(size);
 
-    // خلفية القوس
     final bgPaint = Paint()..color = AppColors.bgPanel2;
     canvas.drawPath(archPath, bgPaint);
 
-    // الامتلاء المتدرج مقصوصًا داخل شكل القوس فقط
     canvas.save();
     canvas.clipPath(archPath);
 
-    const double archTop = 28;
-    const double archBottom = 300;
+    final archTop = size.height * 0.093;
+    final archBottom = size.height;
     final fillHeight = progress * (archBottom - archTop);
     final fillRect = Rect.fromLTWH(0, archBottom - fillHeight, size.width, fillHeight);
 
@@ -124,18 +140,16 @@ class _ArchPainter extends CustomPainter {
     canvas.drawRect(fillRect, fillPaint);
     canvas.restore();
 
-    // إطار القوس الذهبي
     final strokePaint = Paint()
       ..color = AppColors.gold
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawPath(archPath, strokePaint);
 
-    // هلال زخرفي أعلى القوس
     final crescentPaint = Paint()..color = AppColors.gold;
-    canvas.drawCircle(const Offset(120, 14), 9, crescentPaint);
+    canvas.drawCircle(Offset(size.width / 2, size.height * 0.047), 9, crescentPaint);
     final maskPaint = Paint()..color = AppColors.bgDeep;
-    canvas.drawCircle(const Offset(124, 11), 8, maskPaint);
+    canvas.drawCircle(Offset(size.width / 2 + 4, size.height * 0.037), 8, maskPaint);
   }
 
   @override

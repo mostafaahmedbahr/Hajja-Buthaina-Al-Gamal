@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:intl/intl.dart';
 import '../../core/constants/mosque_config.dart';
 import '../models/daily_timings_model.dart';
