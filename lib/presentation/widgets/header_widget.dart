@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/mosque_config.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/responsive_metrics.dart';
 import '../cubit/prayer_state.dart';
 
 class HeaderWidget extends StatelessWidget {
@@ -19,7 +20,7 @@ class HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return expanded ? _buildWideHeader() : _buildCompactHeader();
+    return expanded ? _buildWideHeader() : _buildCompactHeader(context);
   }
 
   Widget _buildWideHeader() {
@@ -66,9 +67,14 @@ class HeaderWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactHeader() {
+  Widget _buildCompactHeader(BuildContext context) {
+    final double f = ResponsiveMetrics.fit(
+      MediaQuery.sizeOf(context).width,
+      MediaQuery.sizeOf(context).height,
+    );
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: 20 * f.clamp(0.8, 1.4), vertical: 14),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
         runSpacing: 12,
@@ -77,26 +83,45 @@ class HeaderWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(state.gregorianText, style: AppTextStyles.dateGregorian),
+              Text(
+                state.gregorianText,
+                style: AppTextStyles.dateGregorian.copyWith(fontSize: 13 * f.clamp(0.9, 1.5)),
+              ),
               const SizedBox(height: 3),
-              Text(state.hijriText, style: AppTextStyles.dateHijri),
+              Text(
+                state.hijriText,
+                style: AppTextStyles.dateHijri.copyWith(fontSize: 15 * f.clamp(0.9, 1.5)),
+              ),
             ],
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(MosqueConfig.name, style: AppTextStyles.mosqueTitle, textAlign: TextAlign.center),
+              Text(
+                MosqueConfig.name,
+                style: AppTextStyles.mosqueTitle.copyWith(fontSize: 30 * f.clamp(0.9, 1.4)),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 2),
-              Text(MosqueConfig.city, style: AppTextStyles.mosqueSubtitle),
+              Text(
+                MosqueConfig.city,
+                style: AppTextStyles.mosqueSubtitle.copyWith(fontSize: 14 * f.clamp(0.9, 1.4)),
+              ),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_clockTime(state.now), style: AppTextStyles.clockTime),
+              Text(
+                _clockTime(state.now),
+                style: AppTextStyles.clockTime.copyWith(fontSize: 34 * f.clamp(0.9, 1.5)),
+              ),
               const SizedBox(height: 3),
-              Text(_meridiem(state.now), style: AppTextStyles.clockMeridiem),
+              Text(
+                _meridiem(state.now),
+                style: AppTextStyles.clockMeridiem.copyWith(fontSize: 14 * f.clamp(0.9, 1.5)),
+              ),
             ],
           ),
         ],

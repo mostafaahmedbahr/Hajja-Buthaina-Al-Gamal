@@ -1,12 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/constants/mosque_config.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/prayer_time_model.dart';
-import '../cubit/prayer_cubit.dart';
-import '../cubit/prayer_state.dart';
 
 class AdhanIqamaDialog extends StatefulWidget {
   final PrayerTimeModel nextPrayer;
@@ -24,12 +20,9 @@ class AdhanIqamaDialog extends StatefulWidget {
   State<AdhanIqamaDialog> createState() => _AdhanIqamaDialogState();
 }
 
-class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
-    with SingleTickerProviderStateMixin {
+class _AdhanIqamaDialogState extends State<AdhanIqamaDialog> {
   late Timer _timer;
   late int _secondsToIqama;
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
   int _azkarIndex = 0;
   Timer? _azkarTimer;
 
@@ -50,15 +43,6 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
   void initState() {
     super.initState();
     _secondsToIqama = widget.nextPrayer.iqamaTime.difference(widget.now).inSeconds.clamp(0, 1 << 30);
-
-    _pulseController = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -87,7 +71,6 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
   void dispose() {
     _timer.cancel();
     _azkarTimer?.cancel();
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -98,54 +81,58 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
     return '$m:$s';
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final prayerName = widget.nextPrayer.arabicName;
     final isIqamaTime = _secondsToIqama <= 0;
+    // مقياس الحوار: يكبُر مع الشاشات الكبيرة لكنه محفوف حتى لا يتجاوز الشاشة
+    final double f = (MediaQuery.sizeOf(context).width / 1366).clamp(0.75, 1.6);
 
     return Dialog(
-      backgroundColor: AppColors.bgPanel,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 800),
-        padding: const EdgeInsets.all(40),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.gold.withOpacity(0.3), width: 2),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.bgPanel,
-              AppColors.bgPanel2,
-              AppColors.bgPanel,
+      child: SingleChildScrollView(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 820 * f),
+          padding: EdgeInsets.all(36 * f),
+          decoration: BoxDecoration(
+            color: AppColors.bgPanel,
+            borderRadius: BorderRadius.circular(20 * f),
+            border: Border.all(color: AppColors.gold.withValues(alpha: 0.3), width: 2),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.bgPanel,
+                AppColors.bgPanel2,
+                AppColors.bgPanel,
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeader(prayerName, isIqamaTime, f),
+              SizedBox(height: 20 * f),
+              _buildCountdown(isIqamaTime, f),
+              SizedBox(height: 20 * f),
+              _buildAzkarSection(f),
+              SizedBox(height: 20 * f),
+              _buildDismissButton(f),
             ],
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildHeader(prayerName, isIqamaTime),
-            const SizedBox(height: 20),
-            _buildCountdown(isIqamaTime),
-            const SizedBox(height: 20),
-            _buildAzkarSection(),
-            const SizedBox(height: 20),
-            _buildDismissButton(),
-          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(String prayerName, bool isIqamaTime) {
+  Widget _buildHeader(String prayerName, bool isIqamaTime, double f) {
     return Column(
       children: [
 
         Text(
           isIqamaTime ? 'حَانَتْ الْإِقَامَةُ' : 'صَلَاةُ $prayerName',
-          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.gold, fontSize: 34),
+          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.gold, fontSize: 34 * f),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 6),
@@ -153,26 +140,26 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
           isIqamaTime
               ? 'قَدْ قَامَتِ الصَّلَاةُ'
               : 'بَيْنَ الْأَذَانِ وَالْإِقَامَةِ',
-          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.goldSoft, fontSize: 26),
+          style: AppTextStyles.cardPrayerName.copyWith(color: AppColors.goldSoft, fontSize: 26 * f),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildCountdown(bool isIqamaTime) {
+  Widget _buildCountdown(bool isIqamaTime, double f) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
+      padding: EdgeInsets.symmetric(horizontal: 48 * f, vertical: 32 * f),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: AppColors.bgDeep.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16 * f),
+        color: AppColors.bgDeep.withValues(alpha: 0.6),
         border: Border.all(
           color: isIqamaTime ? AppColors.ember : AppColors.gold,
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isIqamaTime ? AppColors.ember : AppColors.gold).withOpacity(0.15),
+            color: (isIqamaTime ? AppColors.ember : AppColors.gold).withValues(alpha: 0.15),
             blurRadius: 20,
             spreadRadius: 2,
           ),
@@ -182,7 +169,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         children: [
           Text(
             isIqamaTime ? 'الْإِقَامَةُ الْآنَ' : 'مُتَبَقٍّ لِلْإِقَامَةِ',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gold, fontSize: 22),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gold, fontSize: 22 * f),
           ),
           const SizedBox(height: 12),
           AnimatedSwitcher(
@@ -196,7 +183,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
               key: ValueKey(_secondsToIqama),
               style: AppTextStyles.cardPrayerName.copyWith(
                 color: isIqamaTime ? AppColors.ember : AppColors.gold,
-                fontSize: 88,
+                fontSize: 88 * f,
                 fontWeight: FontWeight.w700,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
@@ -207,25 +194,25 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
     );
   }
 
-  Widget _buildAzkarSection() {
+  Widget _buildAzkarSection(double f) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.auto_awesome_rounded, color: AppColors.gold, size: 20),
+            Icon(Icons.auto_awesome_rounded, color: AppColors.gold, size: 20 * f),
             const SizedBox(width: 8),
             Text(
               'أَذْكَارٌ وَأَدْعِيَةٌ بَيْنَ الْأَذَانِ وَالْإِقَامَةِ',
               style: AppTextStyles.cardPrayerName.copyWith(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w600,
-                fontSize: 24,
+                fontSize: 24 * f,
               ),
             ),
             const SizedBox(width: 8),
-            Icon(Icons.auto_awesome_rounded, color: AppColors.gold, size: 20),
+            Icon(Icons.auto_awesome_rounded, color: AppColors.gold, size: 20 * f),
           ],
         ),
         const SizedBox(height: 12),
@@ -246,14 +233,14 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: AppColors.bgDeep.withOpacity(0.5),
-              border: Border.all(color: AppColors.line.withOpacity(0.3)),
+              color: AppColors.bgDeep.withValues(alpha: 0.5),
+              border: Border.all(color: AppColors.line.withValues(alpha: 0.3)),
             ),
             child: Column(
               children: [
                 Text(
                   _azkarBetweenAdhanIqama[_azkarIndex],
-                  style: AppTextStyles.azkarLarge.copyWith(height: 1.5, fontSize: 28),
+                  style: AppTextStyles.azkarLarge.copyWith(height: 1.5, fontSize: 28 * f),
                   textAlign: TextAlign.center,
                   textDirection: TextDirection.rtl,
                 ),
@@ -271,7 +258,7 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
                         borderRadius: BorderRadius.circular(4),
                         color: index == _azkarIndex
                             ? AppColors.gold
-                            : AppColors.gold.withOpacity(0.3),
+                            : AppColors.gold.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -283,14 +270,14 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         const SizedBox(height: 8),
         Text(
           'قَالَ رَسُولُ اللَّهِ ﷺ: «الدُّعَاءُ لَا يُرَدُّ بَيْنَ الْأَذَانِ وَالْإِقَامَةِ»',
-          style: AppTextStyles.o.copyWith(color: AppColors.gold, fontSize: 18),
+          style: AppTextStyles.o.copyWith(color: AppColors.gold, fontSize: 18 * f),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildDismissButton() {
+  Widget _buildDismissButton(double f) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -298,14 +285,14 @@ class _AdhanIqamaDialogState extends State<AdhanIqamaDialog>
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.gold,
           foregroundColor: AppColors.bgDeep,
-          padding: const EdgeInsets.symmetric(vertical: 22),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: EdgeInsets.symmetric(vertical: 22 * f),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12 * f)),
           elevation: 4,
-          shadowColor: AppColors.gold.withOpacity(0.4),
+          shadowColor: AppColors.gold.withValues(alpha: 0.4),
         ),
           child: Text(
             'إِغْلَاق',
-            style: AppTextStyles.buttonLarge.copyWith(color: AppColors.bgDeep, fontSize: 24),
+            style: AppTextStyles.buttonLarge.copyWith(color: AppColors.bgDeep, fontSize: 24 * f),
         ),
       ),
     );

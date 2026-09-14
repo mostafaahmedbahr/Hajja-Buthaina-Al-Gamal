@@ -54,6 +54,8 @@ class _AzkarTickerWidgetState extends State<AzkarTickerWidget>
   @override
   Widget build(BuildContext context) {
     final String currentZikr = MosqueConfig.azkarList[_currentIndex];
+    // الخط يتدرّج مع حجم الشاشة ليظل واضحًا على شاشات 4K
+    final double fontSize = (18 * MediaQuery.sizeOf(context).width / 1366).clamp(15.0, 34.0);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -69,7 +71,11 @@ class _AzkarTickerWidgetState extends State<AzkarTickerWidget>
           child: FadeTransition(
             opacity: Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController),
             child: Center(
-              child: Text(currentZikr, style: AppTextStyles.tickerText18),
+              child: Text(
+                currentZikr,
+                style: AppTextStyles.tickerText18.copyWith(fontSize: fontSize),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),

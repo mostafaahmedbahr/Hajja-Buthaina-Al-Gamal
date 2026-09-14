@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/mosque_config.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/responsive_metrics.dart';
 import '../cubit/prayer_cubit.dart';
 import '../cubit/prayer_state.dart';
 import '../widgets/adhan_iqama_dialog.dart';
@@ -24,49 +25,57 @@ class MosqueClockScreen extends StatelessWidget {
           Positioned(top: -120, right: -80, child: _Glow(color: AppColors.gold)),
           Positioned(bottom: -140, left: -100, child: _Glow(color: AppColors.ember)),
 
+          // المحتوى في عمود: الساعة فوق، وشريط الأذكار في مؤخرة التدفق
+          // (بدل تداخله مع المحتوى)، حتى لا يغطي أي عنصر على أي مقاس.
           SafeArea(
-            child: BlocListener<PrayerCubit, PrayerState>(
-              listener: (context, state) {
-                if (state.firedKey != null && state.nextPrayer != null) {
-                  AdhanIqamaDialogController.show(context, state.nextPrayer!, state.now);
-                }
-              },
-              child: BlocBuilder<PrayerCubit, PrayerState>(
-                builder: (context, state) {
-                  if (state.status == PrayerStatus.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.gold),
-                    );
-                  }
-
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth > 700) {
-                        return _buildWideLayout(state, constraints);
+            child: Column(
+              children: [
+                Expanded(
+                  child: BlocListener<PrayerCubit, PrayerState>(
+                    listener: (context, state) {
+                      if (state.firedKey != null && state.nextPrayer != null) {
+                        AdhanIqamaDialogController.show(context, state.nextPrayer!, state.now);
                       }
-
-                      return OrientationBuilder(
-                        builder: (context, orientation) {
-                          if (orientation == Orientation.landscape) {
-                            return _buildLandscapeLayout(state);
-                          }
-                          return SingleChildScrollView(
-                            padding: const EdgeInsets.only(bottom: 100),
-                            child: _buildPortraitLayout(state),
-                          );
-                        },
-                      );
                     },
-                  );
-                },
-              ),
+                    child: BlocBuilder<PrayerCubit, PrayerState>(
+                      builder: (context, state) {
+                        if (state.status == PrayerStatus.loading) {
+                          return const Center(
+                            child: CircularProgressIndicator(color: AppColors.gold),
+                          );
+                        }
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            // الشاشات الواسعة (معظم شاشات الويب) → تخطيط المسجد الكامل
+                            if (constraints.maxWidth > 820) {
+                              return _buildWideLayout(state, constraints);
+                            }
+                            // النوافذ الضيقة/نصف المقسومة
+                            return OrientationBuilder(
+                              builder: (context, orientation) {
+                                if (orientation == Orientation.landscape) {
+                                  return _buildLandscapeLayout(state, constraints);
+                                }
+                                return SingleChildScrollView(
+                                  padding: const EdgeInsets.only(bottom: 24),
+                                  child: _buildPortraitLayout(state),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const AzkarTickerWidget(),
+              ],
             ),
           ),
-          const Positioned(bottom: 0, left: 0, right: 0, child: AzkarTickerWidget()),
 
           if (kDebugMode)
             Positioned(
-              bottom: 90,
+              bottom: 110,
               left: 16,
               child: BlocBuilder<PrayerCubit, PrayerState>(
                 builder: (context, state) {
@@ -108,82 +117,152 @@ class MosqueClockScreen extends StatelessWidget {
     );
   }
 
-  // ─── شاشة عريضة (22بوصة) ───
+  // ─── التخطيط العريض — المواقيت على اليمين، والمؤقت + الساعة + الاسم على اليسار ───
   Widget _buildWideLayout(PrayerState state, BoxConstraints constraints) {
-    String _clock(DateTime d) {
+    final double w = constraints.maxWidth;
+    final double h = constraints.maxHeight;
+    final double f = ResponsiveMetrics.fit(w, h);
+
+    String clock(DateTime d) {
       final h12 = d.hour % 12 == 0 ? 12 : d.hour % 12;
-      pad(int n) => n.toString().padLeft(2, '0');
+      String pad(int n) => n.toString().padLeft(2, '0');
       return '${pad(h12)}:${pad(d.minute)}:${pad(d.second)}';
     }
-
-    String _mer(DateTime d) => d.hour >= 12 ? 'مساءً' : 'صباحًا';
+    String mer(DateTime d) => d.hour >= 12 ? 'مساءً' : 'صباحًا';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: Column(
+      padding: EdgeInsets.symmetric(horizontal: 28 * f, vertical: 16 * f),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── الساعة يمين + التاريخ يسار ──
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
+          // ── المواقيت كلها على اليمين (أول عنصر في RTL) ──
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '${_clock(state.now)} ${_mer(state.now)}',
-                  style: AppTextStyles.clockTime.copyWith(fontSize: 40),
-                  textDirection: TextDirection.ltr,
+                  'مواقيت الصلاة',
+                  style: AppTextStyles.domeLabel.copyWith(
+                    fontSize: (19 * f).clamp(16.0, 48.0),
+                    letterSpacing: 1.5,
+                  ),
                 ),
-                const Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(state.gregorianText, style: AppTextStyles.dateGregorian.copyWith(fontSize: 20)),
-                    const SizedBox(height: 4),
-                    Text(state.hijriText, style: AppTextStyles.dateHijri.copyWith(fontSize: 22)),
-                  ],
+                Padding(
+                  padding: EdgeInsets.only(top: 6 * f, bottom: 12 * f),
+                  child: Container(
+                    height: 1,
+                    color: AppColors.line,
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: List.generate(state.prayers.length, (i) {
+                      final p = state.prayers[i];
+                      final isActive = state.nextPrayer != null &&
+                          state.nextPrayer!.key == p.key &&
+                          state.nextPrayer!.time.isAtSameMomentAs(p.time);
+                      final isPassed = p.time.isBefore(state.now);
+
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: i < state.prayers.length - 1 ? 10 * f : 0,
+                          ),
+                          child: PrayerScheduleRow(
+                            prayer: p,
+                            isActive: isActive,
+                            isPassed: isPassed,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
                 ),
               ],
             ),
           ),
 
-          // ── اسم المسجد في النص فوق القوس ──
-          Text(
-            MosqueConfig.name,
-            style: AppTextStyles.mosqueTitle.copyWith(fontSize: 40),
-            textAlign: TextAlign.center,
-          ),
+          SizedBox(width: 20 * f),
 
-          // ── القوس في النص ──
+          // ── المؤقت + الساعة + اسم المسجد على اليسار ──
           Expanded(
-            child: Center(
-              child: DomeCountdownWidget(state: state, width: 360),
-            ),
-          ),
-
-          // ── الصلوات الخمس في صف واحد ──
-          SizedBox(
-            height: 180,
-            child: Row(
-              children: List.generate(state.prayers.length, (i) {
-                final p = state.prayers[i];
-                final isActive = state.nextPrayer != null &&
-                    state.nextPrayer!.key == p.key &&
-                    state.nextPrayer!.time.isAtSameMomentAs(p.time);
-                final isPassed = p.time.isBefore(state.now);
-
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: i < state.prayers.length - 1 ? 16 : 0,
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // التاريخ (في الأعلى)
+                Column(
+                  children: [
+                    Text(
+                      state.gregorianText,
+                      style: AppTextStyles.dateGregorian.copyWith(fontSize: 19 * f),
                     ),
-                    child: PrayerCardWidget(
-                      prayer: p,
-                      isActive: isActive,
-                      isPassed: isPassed,
+                    const SizedBox(height: 3),
+                    Text(
+                      state.hijriText,
+                      style: AppTextStyles.dateHijri.copyWith(fontSize: 22 * f),
                     ),
+                  ],
+                ),
+                SizedBox(height: 6 * f),
+
+                // الساعة (تحت التاريخ مباشرة)
+                Text(
+                  '${clock(state.now)} ${mer(state.now)}',
+                  maxLines: 1,
+                  style: AppTextStyles.clockTime.copyWith(fontSize: 44 * f),
+                  textDirection: TextDirection.ltr,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 6 * f),
+
+                // اسم المسجد
+                Text(
+                  MosqueConfig.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: AppTextStyles.mosqueTitle.copyWith(fontSize: 38 * f),
+                  textAlign: TextAlign.center,
+                ),
+
+                // فاصل زخرفي تحت الاسم
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6 * f),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 1,
+                        width: 60 * f,
+                        color: AppColors.line,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10 * f),
+                        child: Icon(
+                          Icons.auto_awesome_rounded,
+                          color: AppColors.gold,
+                          size: 14 * f,
+                        ),
+                      ),
+                      Container(
+                        height: 1,
+                        width: 60 * f,
+                        color: AppColors.line,
+                      ),
+                    ],
                   ),
-                );
-              }),
+                ),
+                SizedBox(height: 6 * f),
+
+                // القوس: يتمدد ليملأ المساحة المتبقية
+                Expanded(
+                  child: Center(
+                    child: DomeCountdownWidget(state: state),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -191,23 +270,29 @@ class MosqueClockScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLandscapeLayout(PrayerState state) {
+  Widget _buildLandscapeLayout(PrayerState state, BoxConstraints constraints) {
     return Row(
       children: [
         Expanded(
           flex: 2,
-          child: Center(
-            child: DomeCountdownWidget(state: state),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Center(
+              child: DomeCountdownWidget(state: state),
+            ),
           ),
         ),
         Expanded(
           flex: 3,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: 20 * ResponsiveMetrics.fit(constraints.maxWidth, constraints.maxHeight),
+              vertical: 14,
+            ),
             child: Column(
               children: [
                 HeaderWidget(state: state),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Expanded(
                   child: PrayerRowWidget(
                     prayers: state.prayers,
@@ -253,7 +338,7 @@ class _Glow extends StatelessWidget {
         height: 320,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: color.withOpacity(.25), blurRadius: 140, spreadRadius: 40)],
+          boxShadow: [BoxShadow(color: color.withValues(alpha: .25), blurRadius: 140, spreadRadius: 40)],
         ),
       ),
     );

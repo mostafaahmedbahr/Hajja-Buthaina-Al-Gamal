@@ -1,12 +1,12 @@
 {
-    "name": "hajja_buthaina_al_jamal_mosque",
-    "short_name": "hajja_buthaina_al_jamal_mosque",
+    "name": "مسجد الحاجة بثينة الجمال - الساعة الذكية",
+    "short_name": "ساعة المسجد",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#081713",
+    "theme_color": "#081713",
+    "description": "الساعة الذكية لمسجد الحاجة بثينة الجمال - مواقيت الصلاة والعد التنازلي والأذكار",
+    "orientation": "landscape",
     "prefer_related_applications": false,
     "icons": [
         {
