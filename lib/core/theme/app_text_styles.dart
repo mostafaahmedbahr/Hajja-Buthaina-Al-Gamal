@@ -9,7 +9,7 @@ class AppTextStyles {
 
   static TextStyle mosqueTitle = GoogleFonts.cairo(
     fontWeight: FontWeight.w800,
-    fontSize: 30,
+    fontSize: 34,
     color: AppColors.gold,
     height: 1.15,
   );
@@ -21,7 +21,7 @@ class AppTextStyles {
   );
 
   static TextStyle clockTime = GoogleFonts.cairo(
-    fontSize: 34,
+    fontSize: 40,
     fontWeight: FontWeight.w800,
     color: AppColors.ivory,
     fontFeatures: const [FontFeature.tabularFigures()],
@@ -34,58 +34,59 @@ class AppTextStyles {
   );
 
   static TextStyle dateGregorian = GoogleFonts.cairo(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.muted,
   );
 
   static TextStyle dateHijri = GoogleFonts.cairo(
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: FontWeight.w700,
     color: AppColors.goldSoft,
   );
 
   static TextStyle domeLabel = GoogleFonts.cairo(
-    fontSize: 13,
+    fontSize: 15,
     color: AppColors.muted,
     letterSpacing: 1,
   );
 
   static TextStyle domePrayerName = GoogleFonts.cairo(
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: FontWeight.w800,
     color: AppColors.goldSoft,
   );
 
   static TextStyle domeCountdown = GoogleFonts.cairo(
-    fontSize: 30,
+    fontSize: 36,
     fontWeight: FontWeight.w800,
     color: AppColors.ivory,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 
   static TextStyle domeTargetTime = GoogleFonts.cairo(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.muted,
   );
 
   static TextStyle cardPrayerName = GoogleFonts.cairo(
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: FontWeight.w700,
     color: AppColors.goldSoft,
   );
 
   static TextStyle cardPrayerTime = GoogleFonts.cairo(
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: FontWeight.w800,
     color: AppColors.ivory,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 
   static TextStyle cardIqama = GoogleFonts.cairo(
-    fontSize: 11,
-    color: AppColors.muted,
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+    color: AppColors.goldSoft,
   );
 
   static TextStyle tickerText = GoogleFonts.cairo(
@@ -94,7 +95,7 @@ class AppTextStyles {
     color: AppColors.goldSoft,
   );
   static TextStyle tickerText18 = GoogleFonts.cairo(
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
     color: AppColors.goldSoft,
   );
@@ -106,10 +107,10 @@ class AppTextStyles {
   );
 
   static TextStyle azkarLarge = GoogleFonts.cairo(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
     color: AppColors.ivory,
-    height: 1.6,
+    height: 1.5,
   );
 
   static TextStyle o = GoogleFonts.cairo(

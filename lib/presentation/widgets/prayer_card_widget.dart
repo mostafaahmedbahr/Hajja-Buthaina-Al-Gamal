@@ -184,7 +184,7 @@ class PrayerScheduleRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                Icon(_kPrayerIcons[prayer.iconName] ?? Icons.circle, color: AppColors.gold, size: 30 * s),
+                Icon(_kPrayerIcons[prayer.iconName] ?? Icons.circle, color: AppColors.gold, size: 34 * s),
                 SizedBox(width: 14 * s),
                 Expanded(
                   child: Column(
@@ -193,12 +193,12 @@ class PrayerScheduleRow extends StatelessWidget {
                     children: [
                       Text(
                         prayer.arabicName,
-                        style: AppTextStyles.cardPrayerName.copyWith(fontSize: 20 * s),
+                        style: AppTextStyles.cardPrayerName.copyWith(fontSize: 24 * s),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         'إقامة ${_fmtHM(prayer.iqamaTime)}',
-                        style: AppTextStyles.cardIqama.copyWith(fontSize: 13 * s),
+                        style: AppTextStyles.cardIqama.copyWith(fontSize: 18 * s),
                       ),
                     ],
                   ),
@@ -215,7 +215,7 @@ class PrayerScheduleRow extends StatelessWidget {
                   ),
                 Text(
                   _fmtHM(prayer.time),
-                  style: AppTextStyles.cardPrayerTime.copyWith(fontSize: 24 * s),
+                  style: AppTextStyles.cardPrayerTime.copyWith(fontSize: 28 * s),
                   textDirection: TextDirection.ltr,
                 ),
               ],

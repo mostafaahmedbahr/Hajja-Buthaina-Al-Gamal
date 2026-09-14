@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../core/constants/mosque_config.dart';
 import '../../core/theme/app_colors.dart';
@@ -54,8 +55,6 @@ class _AzkarTickerWidgetState extends State<AzkarTickerWidget>
   @override
   Widget build(BuildContext context) {
     final String currentZikr = MosqueConfig.azkarList[_currentIndex];
-    // الخط يتدرّج مع حجم الشاشة ليظل واضحًا على شاشات 4K
-    final double fontSize = (18 * MediaQuery.sizeOf(context).width / 1366).clamp(15.0, 34.0);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -67,14 +66,18 @@ class _AzkarTickerWidgetState extends State<AzkarTickerWidget>
       ),
       child: ClipRect(
         child: SizedBox(
-          height: 50,
+          height: 64,
           child: FadeTransition(
             opacity: Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController),
-            child: Center(
-              child: Text(
-                currentZikr,
-                style: AppTextStyles.tickerText18.copyWith(fontSize: fontSize),
-                textAlign: TextAlign.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Text(
+                  currentZikr,
+                  style: AppTextStyles.tickerText18.copyWith(fontSize: 200),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -124,13 +127,54 @@ class _ZikrPanelWidgetState extends State<ZikrPanelWidget>
     super.dispose();
   }
 
+  // يحسب أكبر حجم خط يملأ لوحة الذكر مع التلفاف على أسطر قدر الحاجة
+  static double _maxFontForBox(
+    String text,
+    TextStyle style,
+    BoxConstraints constraints,
+  ) {
+    final double width = constraints.maxWidth.isFinite
+        ? constraints.maxWidth
+        : 1000;
+    final double height = constraints.maxHeight.isFinite
+        ? constraints.maxHeight
+        : double.infinity;
+
+    TextPainter measure(double size) => TextPainter(
+          text: TextSpan(
+            text: text,
+            style: style.copyWith(fontSize: size, height: 1.3),
+          ),
+          maxLines: null,
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.rtl,
+        )..layout(maxWidth: width);
+
+    double low = 30;
+    double high = math.max(width, height.isFinite ? height : width) * 3;
+    double best = low;
+
+    // بحث ثنائي على أكبر خط يلتف على أسطر ولا يتجاوز صندوق اللوحة
+    for (int i = 0; i < 45; i++) {
+      final mid = (low + high) / 2;
+      final tp = measure(mid);
+      final fitsHeight = height.isFinite ? tp.height <= height : true;
+      if (fitsHeight && tp.width <= width) {
+        best = mid;
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return best;
+  }
+
   @override
   Widget build(BuildContext context) {
     final double f = MediaQuery.sizeOf(context).width / 1366;
-    final double fontSize = (30 * f).clamp(22.0, 84.0);
 
     return Container(
-      padding: EdgeInsets.all(18 * f.clamp(0.8, 2.0)),
+      padding: EdgeInsets.all(14 * f.clamp(0.8, 2.0)),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20 * f.clamp(0.8, 2.0)),
         gradient: const LinearGradient(
@@ -144,14 +188,32 @@ class _ZikrPanelWidgetState extends State<ZikrPanelWidget>
         borderRadius: BorderRadius.circular(16 * f.clamp(0.8, 2.0)),
         child: FadeTransition(
           opacity: Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Text(
-                MosqueConfig.azkarList[_currentIndex],
-                style: AppTextStyles.azkarLarge.copyWith(fontSize: fontSize, height: 1.7),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          child: LayoutBuilder(
+            builder: (context, bc) {
+              final zikr = MosqueConfig.azkarList[_currentIndex];
+              final double hPad = 14 * f;
+              final double vPad = 8 * f;
+              // يقلّص القياس بهامش أمان بسيط حتى يظهر الذكر كاملاً بلا قصّ
+              final inner = BoxConstraints(
+                maxWidth: (bc.maxWidth - hPad * 2).clamp(80.0, double.infinity),
+                maxHeight: (bc.maxHeight - vPad * 2).clamp(80.0, double.infinity),
+              );
+              final fontSize = _maxFontForBox(zikr, AppTextStyles.azkarLarge, inner) * 0.93;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
+                child: Center(
+                  child: Text(
+                    zikr,
+                    style: AppTextStyles.azkarLarge.copyWith(
+                      fontSize: fontSize,
+                      height: 1.3,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

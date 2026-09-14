@@ -154,7 +154,7 @@ class MosqueClockScreen extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.fade,
                   softWrap: false,
-                  style: AppTextStyles.mosqueTitle.copyWith(fontSize: 40 * f),
+                  style: AppTextStyles.mosqueTitle.copyWith(fontSize: 46 * f),
                   textAlign: TextAlign.center,
                 ),
                 Padding(
@@ -188,7 +188,7 @@ class MosqueClockScreen extends StatelessWidget {
 
           SizedBox(width: 16 * f),
 
-          // ── الجانب الأيسر: التاريخ + الساعة + الذكر + شعار الرعاية ──
+          // ── الجانب الأيسر: التاريخ + الساعة ثم الذكر وحده يملأ الباقي ──
           Expanded(
             flex: 2,
             child: Column(
@@ -199,12 +199,12 @@ class MosqueClockScreen extends StatelessWidget {
                   children: [
                     Text(
                       state.gregorianText,
-                      style: AppTextStyles.dateGregorian.copyWith(fontSize: 20 * f),
+                      style: AppTextStyles.dateGregorian.copyWith(fontSize: 23 * f),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       state.hijriText,
-                      style: AppTextStyles.dateHijri.copyWith(fontSize: 23 * f),
+                      style: AppTextStyles.dateHijri.copyWith(fontSize: 27 * f),
                     ),
                   ],
                 ),
@@ -214,20 +214,16 @@ class MosqueClockScreen extends StatelessWidget {
                 Text(
                   '${clock(state.now)} ${mer(state.now)}',
                   maxLines: 1,
-                  style: AppTextStyles.clockTime.copyWith(fontSize: 46 * f),
+                  style: AppTextStyles.clockTime.copyWith(fontSize: 52 * f),
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 12 * f),
+                SizedBox(height: 10 * f),
 
-                // الذكر (على الشمال) — يمتد ليملأ المسافة
+                // الذكر — لوحده يملأ كل المساحة المتبقية
                 Expanded(
                   child: ZikrPanelWidget(),
                 ),
-                SizedBox(height: 12 * f),
-
-                // شعار نبض العطاء واسمها — ليعرف الجميع أنها برعايتها
-                _buildSponsorFooter(f),
               ],
             ),
           ),
@@ -275,53 +271,6 @@ class MosqueClockScreen extends StatelessWidget {
               );
             }),
           ),
-        ),
-      ],
-    );
-  }
-
-  // ─── شعار «نبض العطاء» واسمها أسفله ───
-  Widget _buildSponsorFooter(double f) {
-    final double logoH = (76 * f).clamp(56.0, 190.0);
-    final double logoW = logoH * (2048 / 1448);
-
-    return Column(
-      children: [
-        Text(
-          'بِرِعاية',
-          style: AppTextStyles.o.copyWith(
-            color: AppColors.muted,
-            fontSize: (14 * f).clamp(12.0, 34.0),
-          ),
-        ),
-        SizedBox(height: 6 * f),
-        Container(
-          width: logoW,
-          height: logoH,
-          padding: EdgeInsets.all(6 * f.clamp(0.8, 2.0)),
-          decoration: BoxDecoration(
-            color: AppColors.bgPanel2.withValues(alpha: .6),
-            borderRadius: BorderRadius.circular(14 * f.clamp(0.8, 2.0)),
-            border: Border.all(color: AppColors.line, width: 1),
-          ),
-          child: Image.asset(
-            'assets/images/logo.jpg',
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) => Icon(
-              Icons.favorite_rounded,
-              color: AppColors.gold,
-              size: 40 * f,
-            ),
-          ),
-        ),
-        SizedBox(height: 6 * f),
-        Text(
-          'نبض العطاء',
-          style: AppTextStyles.mosqueTitle.copyWith(
-            fontSize: (26 * f).clamp(22.0, 72.0),
-            color: AppColors.goldSoft,
-          ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
