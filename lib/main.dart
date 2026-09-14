@@ -34,7 +34,7 @@ class MosqueApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'الساعة الذكية للمسجد',
+      title: 'مسجد الحاجة بثينة الجمال',
       debugShowCheckedModeBanner: false,
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar')],
