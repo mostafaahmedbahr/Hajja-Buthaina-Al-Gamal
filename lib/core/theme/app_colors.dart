@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 
-/// نظام الألوان — مبني على لون الهوية المأخوذ من صفحة mawaqit.net للمسجد (#da532c)
-/// مع خلفية خضراء ليلية عميقة وتذهيب يوحي بأجواء المسجد.
+/// نظام الألوان — بهوية «نبض العطاء» (بنفسجي) المستمدة من ألوان المؤسسة:
+/// البنفسجي الأساسي #5B2C82 ومشتقاته، مع خلفية ليلية بنفسجية عميقة.
 class AppColors {
   AppColors._();
 
-  static const Color bgDeep = Color(0xFF081713);
-  static const Color bgPanel = Color(0xFF0D251F);
-  static const Color bgPanel2 = Color(0xFF123024);
+  static const Color bgDeep = Color(0xFF0A0818);
+  static const Color bgPanel = Color(0xFF151139);
+  static const Color bgPanel2 = Color(0xFF1E1850);
 
-  static const Color gold = Color(0xFFD4AF37);
-  static const Color goldSoft = Color(0xFFF2D98A);
-  static const Color ember = Color(0xFFDA532C); // لون هوية mawaqit
-  static const Color ivory = Color(0xFFF6ECD9);
-  static const Color muted = Color(0xFF8FA89C);
-  static const Color line = Color(0x3CD4AF37); // gold بشفافية 22%
+  // بنفسج «نبض العطاء» بدرجاتها: أساسي / فاتح / متوسط
+  static const Color nabadPrimary = Color(0xFF5B2C82);
+  static const Color nabadPrimaryLight = Color(0xFF9D7BEB);
+  static const Color nabadSoft = Color(0xFFCBAFFF);
+
+  static const Color gold = Color(0xFF9D7BEB); // البنفسجي الفاتح المميز
+  static const Color goldSoft = Color(0xFFCBAFFF);
+  static const Color ember = Color(0xFF4C1D95); // بنفسجي عميق للتدرجات والقوة
+  static const Color ivory = Color(0xFFF4F0FF);
+  static const Color muted = Color(0xFF9C93C4);
+  static const Color line = Color(0x3C9D7BEB); // accent بشفافية 22%
 
   static const LinearGradient panelGradient = LinearGradient(
     begin: Alignment.topCenter,
@@ -25,7 +30,7 @@ class AppColors {
   static const LinearGradient activeCardGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF1A3226), Color(0xFF14281F)],
+    colors: [Color(0xFF272159), Color(0xFF1B1741)],
   );
 
   static const LinearGradient domeFillGradient = LinearGradient(

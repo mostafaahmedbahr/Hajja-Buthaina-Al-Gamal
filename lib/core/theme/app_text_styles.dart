@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// خطوط النصوص: Aref Ruqaa لعناصر الهوية (اسم المسجد، أسماء الصلوات)
-/// و Cairo لبقية الواجهة والأرقام (وضوح أفضل للأرقام من مسافة بعيدة).
+/// خطوط النصوص: Cairo بكل الواجهة (نفس خط هوية «نبض العطاء») —
+/// مع أوزان بولد كبيرة لعناصر الهوية ووضوح ممتاز من مسافة بعيدة.
 class AppTextStyles {
   AppTextStyles._();
 
-  static TextStyle mosqueTitle = GoogleFonts.arefRuqaa(
-    fontWeight: FontWeight.bold,
+  static TextStyle mosqueTitle = GoogleFonts.cairo(
+    fontWeight: FontWeight.w800,
     fontSize: 30,
     color: AppColors.gold,
     height: 1.15,
@@ -51,9 +51,9 @@ class AppTextStyles {
     letterSpacing: 1,
   );
 
-  static TextStyle domePrayerName = GoogleFonts.arefRuqaa(
+  static TextStyle domePrayerName = GoogleFonts.cairo(
     fontSize: 30,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w800,
     color: AppColors.goldSoft,
   );
 
@@ -70,9 +70,9 @@ class AppTextStyles {
     color: AppColors.muted,
   );
 
-  static TextStyle cardPrayerName = GoogleFonts.arefRuqaa(
+  static TextStyle cardPrayerName = GoogleFonts.cairo(
     fontSize: 18,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w700,
     color: AppColors.goldSoft,
   );
 
@@ -105,7 +105,7 @@ class AppTextStyles {
     color: AppColors.gold,
   );
 
-  static TextStyle azkarLarge = GoogleFonts.arefRuqaa(
+  static TextStyle azkarLarge = GoogleFonts.cairo(
     fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.ivory,
